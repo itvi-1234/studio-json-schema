@@ -48,7 +48,7 @@ type ProcessASTParams = {
     edges: GraphEdge[],
     parentId: string,
     nodeTitle: string,
-    renderedNodes?: string[],
+    renderedNodes?: Map<string, UnpositionedGraphNode>,
     childId: string | null,
     nodeDepth?: number
 };
@@ -60,7 +60,7 @@ type KeywordHandlerParams = [
     edges: GraphEdge[],
     parentId: string,
     nodeDepth: number,
-    renderedNodes?: string[],
+    renderedNodes?: Map<string, UnpositionedGraphNode>,
 ];
 
 type UpdateNodeOptionalParameters = Partial<{
@@ -77,7 +77,7 @@ type CreateBasicKeywordHandler = (key: string) => KeywordHandler;
 type GetArrayFromNumber = (number: number) => number[];
 type GetSourceHandle = (parentId: string, childId: string | null) => string;
 type GenerateSourceHandles = (key: string | undefined, value: unknown, nodeId: string, defs: boolean | undefined) => HandleConfig[];
-type UpdateNode = (nodes: UnpositionedGraphNode[], schemaUri: string, update: UpdateNodeOptionalParameters) => void;
+type UpdateNode = (node: UnpositionedGraphNode | undefined, update: UpdateNodeOptionalParameters) => void;
 
 
 const neonColors = {
@@ -94,11 +94,11 @@ const neonColors = {
     others: "#CCCCCC", // soft gray
 };
 
-export const processAST: ProcessAST = ({ ast, schemaUri, nodes, edges, parentId, childId, renderedNodes = [], nodeTitle, nodeDepth = 0 }) => {
-    if (renderedNodes.includes(schemaUri)) {
+export const processAST: ProcessAST = ({ ast, schemaUri, nodes, edges, parentId, childId, renderedNodes = new Map(), nodeTitle, nodeDepth = 0 }) => {
+    if (renderedNodes.has(schemaUri)) {
         const sourceHandle = getSourceHandle(parentId, childId);
         const targetHandle = `${sourceHandle}-target`;
-        const targetNode = nodes.find(n => n.id === schemaUri);
+        const targetNode = renderedNodes.get(schemaUri);
         const backEdgeColor = targetNode?.data.nodeStyle.color ?? "#CCCCCC";
 
         edges.push({
@@ -111,8 +111,7 @@ export const processAST: ProcessAST = ({ ast, schemaUri, nodes, edges, parentId,
             targetHandle: targetHandle
         });
         updateNode(
-            nodes,
-            schemaUri,
+            targetNode,
             { addTargetHandle: { handleId: targetHandle, position: Position.Top } }
         );
         return;
@@ -123,8 +122,7 @@ export const processAST: ProcessAST = ({ ast, schemaUri, nodes, edges, parentId,
     const sourceHandles: HandleConfig[] = [];
     const targetHandles: HandleConfig[] = [];
 
-    renderedNodes.push(schemaUri);
-    nodes.push({
+    const newNode: UnpositionedGraphNode = {
         id: schemaUri,
         type: "customNode",
         data: {
@@ -136,7 +134,9 @@ export const processAST: ProcessAST = ({ ast, schemaUri, nodes, edges, parentId,
             targetHandles
         },
         depth: nodeDepth
-    });
+    };
+    renderedNodes.set(schemaUri, newNode);
+    nodes.push(newNode);
 
     if (typeof schemaNodes === "boolean") {
         nodeData.booleanSchema = {
@@ -178,8 +178,7 @@ export const processAST: ProcessAST = ({ ast, schemaUri, nodes, edges, parentId,
     });
 
     updateNode(
-        nodes,
-        schemaUri,
+        newNode,
         { nodeData, nodeStyle: { color: color }, addTargetHandle: { handleId: targetHandle, position: Position.Left } }
     );
 };
@@ -210,11 +209,9 @@ const generateSourceHandles: GenerateSourceHandles = (key, value, nodeId, defs) 
     }];
 }
 
-const updateNode: UpdateNode = (nodes, nodeId, update) => {
-    const node = nodes.find(n => n.id === nodeId);
+const updateNode: UpdateNode = (node, update) => {
     if (!node) {
-        // throw new Error(`Node with id ${nodeId} not found`);
-        console.log(`Node with id ${nodeId} not found`)
+        console.log(`Node not found`)
         return;
     }
 
