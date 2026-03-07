@@ -1,5 +1,4 @@
-﻿/*light theme */
-[data-theme="light"] {
+﻿[data-theme="light"] {
   /* Backgrounds */
   --bg-color: #ffffff;
   --node-bg-color: #ffffff;
@@ -37,13 +36,8 @@
   --popup-header-text-color: #374151;
   --popup-close-btn-hover-color: #717479;
   --popup-backdrop-color: rgba(255, 255, 255, 0.1);
-
-  /* Cursors */
-  --cursor-default: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23fff" stroke="%23000" stroke-width="1.5" d="M3 3l7.5 16.5 2.5-7 7-2.5L3 3z"/></svg>');
-  --cursor-text: url("/I-beam.png");
 }
 
-/* Dark Theme */
 [data-theme="dark"] {
   /* Backgrounds */
   --bg-color: #3d3d3d;
@@ -83,10 +77,6 @@
   --popup-header-text-color: #e0e0e0;
   --popup-close-btn-hover-color: #777575;
   --popup-backdrop-color: rgba(0, 0, 0, 0.5);
-
-  /* Cursors */
-  --cursor-default: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" stroke="%23fff" stroke-width="1.5" d="M3 3l7.5 16.5 2.5-7 7-2.5L3 3z"/></svg>');
-  --cursor-text: url("/I-beam-white.png");
 }
 
 .monaco-highlight-line {
@@ -95,53 +85,9 @@
 }
 /* Smooth transition for editor panel toggle - only when triggered by button */
 .panel-animating [data-panel] {
-  transition:
-    flex-basis 300ms ease,
-    flex-grow 300ms ease;
+  transition: flex-basis 300ms ease, flex-grow 300ms ease;
 }
 
-* {
-  cursor:
-    var(--cursor-default) 0 0,
-    default !important;
-}
-
-.monaco-editor .decorationsOverviewRuler,
-.monaco-editor .scrollbar,
-.monaco-editor .scrollbar * {
-  cursor:
-    var(--cursor-default) 0 0,
-    default !important;
-}
-
-.monaco-editor,
-.monaco-editor *,
-.monaco-editor .view-lines,
-.monaco-editor .cursors-layer,
-.monaco-editor .inputarea {
-  cursor:
-    var(--cursor-text) 7 9,
-    text !important;
-}
-
-.react-flow__node,
-.react-flow__node *,
-.react-flow__edge,
-.react-flow__edge *,
-.react-flow__handle,
-.react-flow__arrowhead,
-a,
-a *,
-button,
-button *,
-select,
-label,
-[role="button"],
-[type="button"],
-[type="submit"],
-[type="reset"],
-[draggable="true"],
-.cursor-pointer,
-.cursor-grab {
-  cursor: pointer !important;
+.react-flow__pane {
+  cursor: default !important;
 }
