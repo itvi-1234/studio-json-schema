@@ -289,8 +289,25 @@ const MonacoEditor = () => {
       }`}
     >
       {isFullScreen && (
-        <ul className="w-full px-4 py-3 bg-[var(--bg-color)] flex justify-end items-center gap-5">
-          <li>
+        <div className="w-full px-4 py-3 bg-[var(--bg-color)] flex justify-between items-center">
+          <div className="flex items-center text-center select-none">
+            <img
+              src={theme === "dark" ? "logo-dark.svg" : "logo-light.svg"}
+              alt="Studio JSON Schema"
+              className="w-12 h-12 md:w-12 md:h-12"
+              draggable="false"
+            />
+            <div className="flex font-mono flex-col ml-1">
+              <span className="text-lg font-bold text-[var(--tool-name-color)]">
+                Studio
+              </span>
+              <span className="text-[10px] opacity-70 text-[var(--tool-name-color)]">
+                JSON Schema
+              </span>
+            </div>
+          </div>
+          <ul className="flex justify-end items-center gap-5">
+            <li>
             <button
               className="text-xl cursor-pointer mt-1"
               onClick={toggleTheme}
@@ -344,6 +361,7 @@ const MonacoEditor = () => {
             <FullscreenToggleButton />
           </li>
         </ul>
+        </div>
       )}
       <PanelGroup direction="horizontal">
         <Panel
