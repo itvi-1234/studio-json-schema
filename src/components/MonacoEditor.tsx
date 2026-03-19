@@ -307,9 +307,9 @@ const MonacoEditor = () => {
             </div>
           </div>
           <ul className="flex justify-end items-center gap-5">
-            <li>
+            <li className="flex items-center">
             <button
-              className="text-xl cursor-pointer mt-1"
+              className="text-xl cursor-pointer"
               onClick={toggleTheme}
               data-tooltip-id="fs-toggle-theme"
             >
@@ -325,7 +325,7 @@ const MonacoEditor = () => {
               style={{ fontSize: "10px", zIndex: 100 }}
             />
           </li>
-          <li>
+          <li className="flex items-center">
             <a
               href="https://github.com/jagpreetrahi/visualize-json-schema"
               target="_blank"
@@ -341,7 +341,7 @@ const MonacoEditor = () => {
               />
             </a>
           </li>
-          <li>
+          <li className="flex items-center">
             <a
               href="https://github.com/jagpreetrahi/visualize-json-schema?tab=readme-ov-file#json-schema-visualizer"
               target="_blank"

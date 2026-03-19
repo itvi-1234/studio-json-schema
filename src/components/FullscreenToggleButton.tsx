@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { BsArrowsFullscreen } from "react-icons/bs";
+import { BiExitFullscreen } from "react-icons/bi";
 import { AppContext } from "../contexts/AppContext";
 
 const FullscreenToggleButton = () => {
@@ -11,7 +11,7 @@ const FullscreenToggleButton = () => {
       className="cursor-pointer"
       style={{ color: "var(--navigation-text-color)" }}
     >
-      <BsArrowsFullscreen />
+      <BiExitFullscreen size={23} />
     </button>
   );
 };

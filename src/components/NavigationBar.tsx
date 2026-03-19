@@ -28,8 +28,8 @@ const NavigationBar = () => {
         </div>
       </div>
 
-      <ul className="flex gap-5 mr-10">
-        <li>
+      <ul className="flex items-center gap-5 mr-10">
+        <li className="flex items-center">
           <select
             onChange={(e) => changeSchemaFormat(e.target.value as SchemaFormat)}
             className="text-sm border rounded-sm bg-[var(--bg-color)] text-[var(--dropdown-text-color)] border-[var(--navigation-text-color)] cursor-pointer"
@@ -39,7 +39,7 @@ const NavigationBar = () => {
             <option value="yaml">YAML</option>
           </select>
         </li>
-        <li>
+        <li className="flex items-center">
           <button
             className="text-xl cursor-pointer"
             onClick={toggleTheme}
@@ -57,12 +57,12 @@ const NavigationBar = () => {
             style={{ fontSize: "10px" }}
           />
         </li>
-        <li>
+        <li className="flex items-center">
           <a
             href="https://github.com/jagpreetrahi/visualize-json-schema"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xl"
+            className="text-xl flex items-center"
             data-tooltip-id="github"
           >
             <BsGithub className="text-[var(--navigation-text-color)]" />
@@ -73,12 +73,12 @@ const NavigationBar = () => {
             />
           </a>
         </li>
-        <li>
+        <li className="flex items-center">
           <a
             href="https://github.com/jagpreetrahi/visualize-json-schema?tab=readme-ov-file#json-schema-visualizer"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xl"
+            className="text-xl flex items-center"
             data-tooltip-id="learn-keywords"
           >
             <BsBook className="text-[var(--navigation-text-color)]" />
@@ -89,7 +89,7 @@ const NavigationBar = () => {
             />
           </a>
         </li>
-        <li>
+        <li className="flex items-center">
           <FullscreenToggleButton />
         </li>
       </ul>
