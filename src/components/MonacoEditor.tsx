@@ -327,7 +327,7 @@ const MonacoEditor = () => {
           </li>
           <li className="flex items-center">
             <a
-              href="https://github.com/jagpreetrahi/visualize-json-schema"
+              href="https://github.com/ioflux-org/studio-json-schema"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl flex items-center cursor-pointer"
@@ -343,7 +343,7 @@ const MonacoEditor = () => {
           </li>
           <li className="flex items-center">
             <a
-              href="https://github.com/jagpreetrahi/visualize-json-schema?tab=readme-ov-file#json-schema-visualizer"
+              href="https://github.com/ioflux-org/studio-json-schema?tab=readme-ov-file#json-schema-visualizer"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl flex items-center cursor-pointer"
