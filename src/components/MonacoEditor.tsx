@@ -1,4 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
+
 import { parseTree, findNodeAtLocation } from "jsonc-parser";
 import {
   Panel,
@@ -21,7 +22,7 @@ import type { editor } from "monaco-editor";
 import defaultSchema from "../data/defaultJSONSchema.json";
 import { AppContext } from "../contexts/AppContext";
 import SchemaVisualization from "./SchemaVisualization";
-import FullscreenToggleButton from "./FullscreenToggleButton";
+import NavigationBar from "./NavigationBar";
 import EditorToggleButton from "./EditorToggleButton";
 import { parseSchema } from "../utils/parseSchema";
 import YAML from "js-yaml";
@@ -43,6 +44,7 @@ const DEFAULT_SCHEMA_ID = "https://studio.ioflux.org/schema";
 const DEFAULT_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema";
 const SESSION_SCHEMA_KEY = "ioflux.schema.editor.content";
 const SESSION_FORMAT_KEY = "ioflux.schema.editor.format";
+const DEFAULT_EDITOR_PANEL_WIDTH = 25; // in percentage
 
 const JSON_SCHEMA_DIALECTS = [
   "https://json-schema.org/draft/2020-12/schema",
@@ -129,7 +131,7 @@ const MonacoEditor = () => {
     if (editorVisible) {
       editorPanelRef.current.collapse();
     } else {
-      editorPanelRef.current.expand();
+      editorPanelRef.current.resize(DEFAULT_EDITOR_PANEL_WIDTH);
     }
 
     setEditorVisible((prev) => !prev);
@@ -286,16 +288,12 @@ const MonacoEditor = () => {
       }`}
     >
       {isFullScreen && (
-        <div className="w-full px-1 bg-[var(--view-bg-color)] justify-items-end">
-          <div className="text-[var(--view-text-color)]">
-            <FullscreenToggleButton />
-          </div>
-        </div>
+        <NavigationBar />
       )}
       <PanelGroup direction="horizontal">
         <Panel
           className="flex flex-col"
-          defaultSize={25}
+          defaultSize={DEFAULT_EDITOR_PANEL_WIDTH}
           ref={editorPanelRef}
           collapsible
         >

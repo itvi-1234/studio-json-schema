@@ -299,15 +299,20 @@ const GraphView = ({
         setMatchedNodes([]);
         setCurrentMatchIndex(0);
         setErrorMessage("");
+        setNodes((nds) => nds.map((n) => ({ ...n, selected: false })));
+        fitView({ duration: 800, padding: 0.05 });
         return;
       }
 
       const searchWords = trimmed.toLowerCase().match(/[a-zA-Z0-9_]+/g) || [];
 
-      const foundNodes = nodes.filter((node) => {
-        const labelWords = extractKeywords(node.data.nodeLabel);
-        return searchWords.every((word) => labelWords.includes(word));
-      });
+      const foundNodes =
+        searchWords.length === 0
+          ? []
+          : nodes.filter((node) => {
+              const labelWords = extractKeywords(node.data.nodeLabel);
+              return searchWords.every((word) => labelWords.includes(word));
+            });
 
       setMatchedNodes(foundNodes);
 
@@ -334,10 +339,30 @@ const GraphView = ({
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [searchString, nodes]);
+  }, [searchString]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (matchCount <= 1) return;
+
+      if (e.key === "ArrowRight" || e.key === "Enter") {
+        e.preventDefault();
+        navigateMatch("next");
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        navigateMatch("prev");
+      }
+    },
+    [matchCount, navigateMatch]
+  );
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
+    <div
+      ref={containerRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      className="relative w-full h-full"
+    >
       <ReactFlow
         nodes={nodes}
         edges={animatedEdges}
