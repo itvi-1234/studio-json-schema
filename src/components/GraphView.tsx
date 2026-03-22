@@ -279,6 +279,9 @@ const GraphView = ({
       timeoutId = setTimeout(() => {
         if (!userInteractedRef.current) {
           fitView({ duration: 800, padding: 0.05 });
+        } else {
+          const currentZoom = getZoom();
+          fitView({ duration: 800, minZoom: currentZoom, maxZoom: currentZoom, padding: 0.05 });
         }
       }, 100);
     });
