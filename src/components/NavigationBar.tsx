@@ -11,7 +11,7 @@ const NavigationBar = () => {
   return (
     <nav className={`flex items-center relative z-10 bg-[var(--bg-color)] ${
       isFullScreen
-        ? `w-full px-4 py-1 justify-end ${theme === "light" ? "shadow-md border-b-[1px] border-gray-200" : ""}`
+        ? `w-full px-2 py-1 justify-end ${theme === "light" ? "shadow-md border-b-[1px] border-gray-200" : ""}`
         : "h-[8vh] justify-between shadow-lg"
     }`}>
       {!isFullScreen && (
