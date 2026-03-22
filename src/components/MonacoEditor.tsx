@@ -92,7 +92,7 @@ const saveSchemaJSON = (key: string, schema: JSONSchema) => {
 };
 
 const MonacoEditor = () => {
-  const { theme, toggleTheme, isFullScreen, containerRef, schemaFormat, selectedNode } =
+  const { theme, toggleTheme, isFullScreen, containerRef, schemaFormat, changeSchemaFormat, selectedNode } =
     useContext(AppContext);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -289,8 +289,18 @@ const MonacoEditor = () => {
       }`}
     >
       {isFullScreen && (
-        <ul className="w-full px-4 py-3 bg-[var(--bg-color)] flex justify-end items-center gap-5">
-            <li className="flex items-center">
+        <ul className="w-full px-4 py-1 bg-[var(--bg-color)] flex justify-end items-center gap-5">
+          <li className="flex items-center">
+            <select
+              onChange={(e) => changeSchemaFormat(e.target.value as SchemaFormat)}
+              className="text-sm border rounded-sm bg-[var(--bg-color)] text-[var(--dropdown-text-color)] border-[var(--navigation-text-color)] cursor-pointer"
+              value={schemaFormat}
+            >
+              <option value="json">JSON</option>
+              <option value="yaml">YAML</option>
+            </select>
+          </li>
+          <li className="flex items-center">
             <button
               className="text-xl cursor-pointer"
               onClick={toggleTheme}
