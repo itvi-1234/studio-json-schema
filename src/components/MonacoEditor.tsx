@@ -295,7 +295,7 @@ const MonacoEditor = () => {
           ref={editorPanelRef}
           collapsible
         >
-          <div className="flex items-center justify-end px-2 py-1 bg-[var(--validation-bg-color)] border-b border-gray-300">
+          <div className="flex items-center justify-end px-2 py-1 bg-[var(--validation-bg-color)]">
             <select
               onChange={(e) => changeSchemaFormat(e.target.value as SchemaFormat)}
               className="text-sm border rounded-sm bg-[var(--bg-color)] text-[var(--dropdown-text-color)] border-[var(--navigation-text-color)] cursor-pointer"
