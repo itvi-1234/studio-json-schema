@@ -295,20 +295,15 @@ const MonacoEditor = () => {
           ref={editorPanelRef}
           collapsible
         >
-          <div className="flex items-center justify-end px-2 py-1 bg-[var(--validation-bg-color)] gap-1">
-            {(["json", "yaml"] as SchemaFormat[]).map((fmt) => (
-              <button
-                key={fmt}
-                onClick={() => changeSchemaFormat(fmt)}
-                className={`text-xs px-2 py-0.5 rounded cursor-pointer font-mono transition-colors duration-150
-                  ${schemaFormat === fmt
-                    ? "bg-[var(--navigation-text-color)] text-[var(--bg-color)]"
-                    : "text-[var(--navigation-text-color)] hover:opacity-70"
-                  }`}
-              >
-                {fmt.toUpperCase()}
-              </button>
-            ))}
+          <div className="flex items-center justify-end px-2 py-1 bg-[var(--validation-bg-color)]">
+            <select
+              onChange={(e) => changeSchemaFormat(e.target.value as SchemaFormat)}
+              className="text-sm border rounded-sm bg-[var(--bg-color)] text-[var(--dropdown-text-color)] border-[var(--navigation-text-color)] cursor-pointer"
+              value={schemaFormat}
+            >
+              <option value="json">JSON</option>
+              <option value="yaml">YAML</option>
+            </select>
           </div>
           <Editor
             height="90%"
