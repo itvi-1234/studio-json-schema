@@ -299,7 +299,7 @@ const MonacoEditor = () => {
             <select
               value={schemaFormat}
               onChange={(e) => changeSchemaFormat(e.target.value as SchemaFormat)}
-              className="ml-auto flex-shrink-0 bg-transparent text-[var(--text-color)] text-sm outline-none cursor-pointer border border-[var(--popup-border-color)] rounded px-1 py-0.5"
+              className="ml-auto flex-shrink-0 bg-transparent text-[var(--text-color)] text-sm outline-none cursor-pointer border border-[var(--popup-border-color)] rounded-sm"
             >
               <option value="json">JSON</option>
               <option value="yaml">YAML</option>
