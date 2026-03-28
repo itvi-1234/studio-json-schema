@@ -43,4 +43,4 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           projectName: ${{ vars.CF_PROJECT_NAME }}
           directory: ${{ steps.preview-build-artifact.outputs.download-path }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          deploymentName: pr-${{ github.event.workflow_run.pull_requests[0].number }}
