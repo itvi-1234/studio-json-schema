@@ -1,0 +1,26 @@
+name: Changeset Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  changeset-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for changeset
+        run: |
+          git fetch origin main
+          CHANGED=$(git diff --name-only origin/main...HEAD | grep "^.changeset/.*\.md$" || true)
+
+          if [ -z "$CHANGED" ]; then
+            echo "❌ No changeset found. Run 'npx changeset'"
+            exit 1
+          fi
+
+          echo "✅ Changeset detected:"
+          echo "$CHANGED"
