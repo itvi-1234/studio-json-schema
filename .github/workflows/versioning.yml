@@ -1,0 +1,38 @@
+name: Versioning
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: website-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install Dependencies and Build
+        run: npm ci
+
+      - name: Create/Update Release PR
+        uses: changesets/action@v1
+        with:
+          commit: "chore: version bump"
+          title: "chore: version bump"
