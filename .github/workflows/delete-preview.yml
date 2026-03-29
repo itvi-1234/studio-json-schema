@@ -15,9 +15,9 @@ jobs:
       - name: Delete preview deployment
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >
             pages deployment delete
-            --project-name=${{ vars.CF_PROJECT_NAME }}
+            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
             --branch=pr-${{ github.event.pull_request.number }}
