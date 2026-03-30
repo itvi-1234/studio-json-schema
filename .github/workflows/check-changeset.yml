@@ -8,7 +8,7 @@ on:
     # These PRs only update metadata and delete changesets, so they
     # don't require a new changeset file to be added.
     paths-ignore:
-      - "package.json"
+      - "package*.json"
       - "CHANGELOG.md"
       - ".changeset/**"
 
