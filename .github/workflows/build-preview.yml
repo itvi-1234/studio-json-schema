@@ -3,6 +3,9 @@ name: Build PR Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - changeset-release/**
 
 concurrency:
   group: preview-build-${{ github.event.pull_request.number }}
@@ -29,8 +32,13 @@ jobs:
       - name: Build Site
         run: npm run build
 
+      - name: Save PR number
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: preview-dist
-          path: dist
+          path: |
+            dist
+            pr_number.txt
