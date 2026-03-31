@@ -289,7 +289,7 @@ const keywordHandlerMap: KeywordHandlerMap = {
     "https://json-schema.org/keyword/$defs": (ast, keywordValue, nodes, edges, parentId, nodeDepth, renderedNodes) => {
         const value = keywordValue as string[];
         for (const [index, item] of value.entries()) {
-                const defName = `$defs["${item.split("#/$defs/").pop()}"]`;
+            const defName = `$defs["${item.split("#/$defs/").pop()}"]`;
             processAST({ ast, schemaUri: item, nodes, edges, parentId, renderedNodes, childId: String(index), nodeTitle: defName, nodeDepth });
         }
         return { key: "$defs", data: { value: getArrayFromNumber(value.length) } }
