@@ -206,9 +206,11 @@ These issues will be addressed as time permits. If you encounter any other probl
 ### Getting started
 
 - Fork the repository
- ```bash
-    $ git clone https://github.com/ioflux-org/studio-json-schema.git
-  ```  
+
+```bash
+   $ git clone https://github.com/ioflux-org/studio-json-schema.git
+```
+
 - Create a new branch  
   `$ git checkout -b feature/my-feature`
 - Make your changes
@@ -216,12 +218,12 @@ These issues will be addressed as time permits. If you encounter any other probl
   - After making changes, don't forget to commit with the sign-off flag (-s)
   ```bash
    $ git commit -s -m “commit message”
-  ``` 
+  ```
+
   - Once all the changes have been commited, push the changes.
   ```bash
     $ git push origin <branch-name>
   ```
-    
 
 ## Run locally
 
@@ -295,42 +297,22 @@ Ways to contribute:
 - Fix bugs or implement new features
 - Suggest better visual or UX improvement
 
-### Versioning Rules (Important)
+### Versioning
 
-We use the `version` field in `package.json` as the single source of truth for releases. Any PR that introduces **application-level changes** (changes that affect the behavior, UI, or functionality of the app) must bump the version appropriately.
+We use [Changesets](https://github.com/changesets/changesets) for versioning and release notes.
 
-We follow **Semantic Versioning (SemVer)**: `MAJOR.MINOR.PATCH`
+For PRs that change app behavior, UI, or functionality:
 
-Update the version in `package.json` based on the type of change:
+```bash
+npx changeset
+```
 
-| Change Type        | Version Bump | Example        |
-|--------------------|--------------|----------------|
-| Bug fix            | PATCH        | 1.2.3 → 1.2.4  |
-| New feature        | MINOR        | 1.2.3 → 1.3.0  |
-| Breaking change    | MAJOR        | 1.2.3 → 2.0.0  |
-| Pre-release build  | Prerelease   | 1.2.3 → 1.2.4-beta |
+Follow the prompt to select the package and bump type, then commit the generated file in `.changeset/`.
 
-### When you do NOT need to bump the version
-
-Do **not** bump the version if your PR only changes:
+You can skip adding a changeset for PRs that only modify:
 
 - `.github/**`
-- Markdown files (`*.md`)
-
-These PRs are treated as non-release changes and will not trigger deployments or releases.
-
-### Enforcement
->
-> [!IMPORTANT]
-> Our CI will block PRs if:
->
-> - Application code is changed but `package.json` version is not bumped
-> - The version format is invalid
-> - The version already exists as a Git tag
->
-> This ensures every release is clean, predictable, and traceable.
-
-
+- Markdown/docs files (`*.md`)
 
 ---
 
