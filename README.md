@@ -210,15 +210,15 @@ These issues will be addressed as time permits. If you encounter any other probl
 
 - Fork the repository
 
-```bash
-git clone https://github.com/ioflux-org/studio-json-schema.git
-```
+  ```bash
+  git clone https://github.com/ioflux-org/studio-json-schema.git
+  ```
 
 - Create a new branch
 
-```bash
-git checkout -b feature/my-feature
-```
+  ```bash
+  git checkout -b feature/my-feature
+  ```
 
 - Make your changes
 - Create a Pull Request
@@ -339,6 +339,13 @@ You do not need to generate a changeset if your PR only touches:
 - `.github/**` (CI/CD workflows)
 - `*.md` files (Documentation)
 - Internal tests or tooling not affecting the shipped application
+
+### Enforcement
+>
+> [!IMPORTANT]
+> Pull requests without a changeset file will be blocked by CI.
+>
+> This policy ensures all changes are properly versioned and that every integration remains clean, predictable, and traceable.
 
 ---
 
