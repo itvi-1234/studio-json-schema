@@ -34,6 +34,9 @@ without manually tracing large JSON Schema files.
 - [Future Enhancements / Roadmap](#future-enhancements--roadmap)
 - [Contributing](#contributing)
   - [Getting started](#getting-started)
+  - [Versioning Rules & Release Process](#versioning-rules--release-process)
+    - [How to create a changeset](#how-to-create-a-changeset)
+    - [When you do NOT need a changeset](#when-you-do-not-need-a-changeset)
 - [Additional Notes](#additional-notes)
 
 ---
@@ -336,13 +339,6 @@ You do not need to generate a changeset if your PR only touches:
 - `.github/**` (CI/CD workflows)
 - `*.md` files (Documentation)
 - Internal tests or tooling not affecting the shipped application
-
-#### Required post-implementation steps
-
-- Run relevant checks/tests locally.
-- Commit your code changes and generated changeset (if required).
-- Push your branch and open or update the PR.
-- Mention in the PR summary whether a changeset was added or intentionally skipped.
 
 ---
 
