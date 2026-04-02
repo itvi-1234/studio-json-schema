@@ -54,40 +54,40 @@ export const resolveCollisions: CollisionAlgorithm = (
     for (let iter = 0; iter <= maxIterations; iter++) {
         let moved = false;
 
-        for (const [, bucketBoxes] of depthBuckets) {
-            for (let i = 0; i < bucketBoxes.length; i++) {
-                for (let j = i + 1; j < bucketBoxes.length; j++) {
-                    const A = bucketBoxes[i];
-                    const B = bucketBoxes[j];
+    for (const [, bucketBoxes] of depthBuckets) {
+        for (let i = 0; i < bucketBoxes.length; i++) {
+            for (let j = i + 1; j < bucketBoxes.length; j++) {
+                const A = bucketBoxes[i];
+                const B = bucketBoxes[j];
 
-                    // Calculate center positions
-                    const centerAX = A.x + A.width * 0.5;
-                    const centerAY = A.y + A.height * 0.5;
-                    const centerBX = B.x + B.width * 0.5;
-                    const centerBY = B.y + B.height * 0.5;
+                // Calculate center positions
+                const centerAX = A.x + A.width * 0.5;
+                const centerAY = A.y + A.height * 0.5;
+                const centerBX = B.x + B.width * 0.5;
+                const centerBY = B.y + B.height * 0.5;
 
-                    // Calculate distance between centers
-                    const dx = centerAX - centerBX;
-                    const dy = centerAY - centerBY;
+                // Calculate distance between centers
+                const dx = centerAX - centerBX;
+                const dy = centerAY - centerBY;
 
-                    // Calculate overlap along each axis
-                    const px = (A.width + B.width) * 0.5 - Math.abs(dx);
-                    const py = (A.height + B.height) * 0.5 - Math.abs(dy);
+                // Calculate overlap along each axis
+                const px = (A.width + B.width) * 0.5 - Math.abs(dx);
+                const py = (A.height + B.height) * 0.5 - Math.abs(dy);
 
-                    // Check if there's significant vertical overlap
-                    if (px > overlapThreshold && py > overlapThreshold) {
-                        moved = A.moved = B.moved = true;
+                // Check if there's significant vertical overlap
+                if (px > overlapThreshold && py > overlapThreshold) {
+                    moved = A.moved = B.moved = true;
 
-                        // Vertical-only resolution
-                        const direction = dy >= 0 ? 1 : -1;
-                        const moveAmount = py * 0.5;
+                    // Vertical-only resolution
+                    const direction = dy >= 0 ? 1 : -1;
+                    const moveAmount = py * 0.5;
 
-                        A.y += moveAmount * direction;
-                        B.y -= moveAmount * direction;
-                    }
+                    A.y += moveAmount * direction;
+                    B.y -= moveAmount * direction;
                 }
             }
         }
+    }
 
         if (!moved) break;
     }
