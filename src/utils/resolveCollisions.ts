@@ -72,7 +72,7 @@ export const resolveCollisions: CollisionAlgorithm = (
                 const px = (A.width + B.width) * 0.5 - Math.abs(dx);
                 const py = (A.height + B.height) * 0.5 - Math.abs(dy);
 
-                 // Check if there's significant vertical overlap
+                // Check if there's significant vertical overlap
                 if (px > overlapThreshold && py > overlapThreshold) {
                     moved = A.moved = B.moved = true;
                     const moveAmount = py * 0.5;
@@ -101,7 +101,7 @@ export const resolveCollisions: CollisionAlgorithm = (
             bucketBoxes.sort((a, b) => a.y - b.y);
 
             if (resolveBoxPairs(bucketBoxes, bucketBoxes, true)) moved = true;
-            
+
             const nextBucket = depthBuckets.get(depth + 1);
             if (nextBucket) {
                 nextBucket.sort((a, b) => a.y - b.y);
