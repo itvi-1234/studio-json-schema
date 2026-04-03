@@ -58,25 +58,30 @@ export const resolveCollisions: CollisionAlgorithm = (
                 const A = listA[i];
                 const B = listB[j];
 
+                // Calculate center positions
                 const centerAX = A.x + A.width * 0.5;
                 const centerAY = A.y + A.height * 0.5;
                 const centerBX = B.x + B.width * 0.5;
                 const centerBY = B.y + B.height * 0.5;
 
+                // Calculate distance between centers
                 const dx = centerAX - centerBX;
                 const dy = centerAY - centerBY;
 
+                // Calculate overlap along each axis
                 const px = (A.width + B.width) * 0.5 - Math.abs(dx);
                 const py = (A.height + B.height) * 0.5 - Math.abs(dy);
 
-
+                 // Check if there's significant vertical overlap
                 if (px > overlapThreshold && py > overlapThreshold) {
                     moved = A.moved = B.moved = true;
                     const moveAmount = py * 0.5;
                     if (dy <= 0) {
+                        // A is above B
                         A.y -= moveAmount;
                         B.y += moveAmount;
                     } else {
+                        // A is below B
                         A.y += moveAmount;
                         B.y -= moveAmount;
                     }
@@ -94,8 +99,9 @@ export const resolveCollisions: CollisionAlgorithm = (
         for (const depth of sortedDepths) {
             const bucketBoxes = depthBuckets.get(depth)!;
             bucketBoxes.sort((a, b) => a.y - b.y);
-            if (resolveBoxPairs(bucketBoxes, bucketBoxes, true)) moved = true;
 
+            if (resolveBoxPairs(bucketBoxes, bucketBoxes, true)) moved = true;
+            
             const nextBucket = depthBuckets.get(depth + 1);
             if (nextBucket) {
                 nextBucket.sort((a, b) => a.y - b.y);
