@@ -93,7 +93,7 @@ export const resolveCollisions: CollisionAlgorithm = (
 
     const sortedDepths = Array.from(depthBuckets.keys()).sort((a, b) => a - b);
 
-    for (let iter = 0; iter <= maxIterations; iter++) {
+    for (let iter = 0; iter < maxIterations; iter++) {
         let moved = false;
 
         for (const depth of sortedDepths) {
