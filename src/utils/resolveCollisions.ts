@@ -93,19 +93,33 @@ export const resolveCollisions: CollisionAlgorithm = (
 
     const sortedDepths = Array.from(depthBuckets.keys()).sort((a, b) => a - b);
 
+    const bucketXRange = new Map<number, { minX: number; maxX: number }>();
+    for (const depth of sortedDepths) {
+        const bucketBoxes = depthBuckets.get(depth)!;
+        const minX = Math.min(...bucketBoxes.map((b) => b.x));
+        const maxX = Math.max(...bucketBoxes.map((b) => b.x + b.width));
+        bucketXRange.set(depth, { minX, maxX });
+    }
+
     for (let iter = 0; iter < maxIterations; iter++) {
         let moved = false;
 
-        for (const depth of sortedDepths) {
-            const bucketBoxes = depthBuckets.get(depth)!;
-            bucketBoxes.sort((a, b) => a.y - b.y);
+        for (let i = 0; i < sortedDepths.length; i++) {
+            const depthA = sortedDepths[i];
+            const bucketA = depthBuckets.get(depthA)!;
+            bucketA.sort((a, b) => a.y - b.y);
 
-            if (resolveBoxPairs(bucketBoxes, bucketBoxes, true)) moved = true;
+            if (resolveBoxPairs(bucketA, bucketA, true)) moved = true;
+            for (let j = i + 1; j < sortedDepths.length; j++) {
+                const depthB = sortedDepths[j];
+                const rangeA = bucketXRange.get(depthA)!;
+                const rangeB = bucketXRange.get(depthB)!;
 
-            const nextBucket = depthBuckets.get(depth + 1);
-            if (nextBucket) {
-                nextBucket.sort((a, b) => a.y - b.y);
-                if (resolveBoxPairs(bucketBoxes, nextBucket, false)) moved = true;
+                if (rangeA.maxX <= rangeB.minX || rangeB.maxX <= rangeA.minX) break;
+
+                const bucketB = depthBuckets.get(depthB)!;
+                bucketB.sort((a, b) => a.y - b.y);
+                if (resolveBoxPairs(bucketA, bucketB, false)) moved = true;
             }
         }
 
