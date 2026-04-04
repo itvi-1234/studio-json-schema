@@ -26,6 +26,7 @@ import NavigationBar from "./NavigationBar";
 import EditorToggleButton from "./EditorToggleButton";
 import { parseSchema } from "../utils/parseSchema";
 import YAML from "js-yaml";
+import { parseDocument } from "yaml";
 import type { JSONSchema } from "@apidevtools/json-schema-ref-parser";
 
 type ValidationStatus = {
@@ -166,45 +167,34 @@ const MonacoEditor = () => {
         return /^\d+$/.test(decoded) ? parseInt(decoded, 10) : decoded;
       });
 
-    let textToParse = text;
+    let startPos, endPos;
+
     if (schemaFormat === "yaml") {
       try {
-        const obj = YAML.load(text);
-        textToParse = JSON.stringify(obj, null, 2);
+        const doc = parseDocument(text);
+        // If path is empty, we are at root, otherwise fetch the node.
+        const node = (path.length === 0 ? doc.contents : doc.getIn(path, true)) as any;
+        
+        if (!node || !node.range) return;
+        
+        const [start, valueEnd, nodeEnd] = node.range;
+        startPos = model.getPositionAt(start);
+        endPos = model.getPositionAt(nodeEnd ?? valueEnd);
       } catch (err) {
         return;
       }
+    } else {
+      const tree = parseTree(text);
+      if (!tree) return;
+
+      const node = findNodeAtLocation(tree, path);
+      if (!node) return;
+
+      startPos = model.getPositionAt(node.offset);
+      endPos = model.getPositionAt(node.offset + node.length);
     }
 
-    const tree = parseTree(textToParse);
-    if (!tree) return;
-
-    const node = findNodeAtLocation(tree, path);
-
-    if (node) {
-      let startPos, endPos;
-
-      if (schemaFormat === "yaml") {
-        // Approximate the line numbers from the JSON counterpart.
-        // JSON adds an opening `{` which generally shifts lines by +1 compared to YAML.
-        const startLineJSON = textToParse.substring(0, node.offset).split("\n").length;
-        const endLineJSON = textToParse.substring(0, node.offset + node.length).split("\n").length;
-        
-        const startLine = Math.max(1, startLineJSON - 1);
-        const endLine = Math.max(1, endLineJSON - 1);
-
-        startPos = { 
-          lineNumber: Math.min(startLine, model.getLineCount()), 
-          column: 1 
-        };
-        endPos = { 
-          lineNumber: Math.min(endLine, model.getLineCount()), 
-          column: 1 
-        };
-      } else {
-        startPos = model.getPositionAt(node.offset);
-        endPos = model.getPositionAt(node.offset + node.length);
-      }
+    if (startPos && endPos) {
 
       editorRef.current.revealPositionInCenter(startPos);
       editorRef.current.setPosition(startPos);
