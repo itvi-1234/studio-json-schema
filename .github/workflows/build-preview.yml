@@ -38,8 +38,6 @@ jobs:
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
-            # For push events (like Changeset release branch updates), 
-            # find the PR associated with this branch.
             PR_NUMBER=$(gh pr list --head "${{ github.ref_name }}" --json number --jq '.[0].number')
             echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
           fi
