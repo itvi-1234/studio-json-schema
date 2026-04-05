@@ -8,7 +8,7 @@ on:
       - 'changeset-release/**'
 
 concurrency:
-  group: preview-build-${{ github.event.pull_request.number || github.ref }}
+  group: preview-build-${{ github.event.pull_request.head.repo.full_name || github.repository }}
   cancel-in-progress: true
 
 jobs:
@@ -39,6 +39,10 @@ jobs:
             echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
             PR_NUMBER=$(gh pr list --head "${{ github.ref_name }}" --json number --jq '.[0].number')
+            if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" == "null" ]; then
+              echo "::error::No open PR found for branch '${{ github.ref_name }}'"
+              exit 1
+            fi
             echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
           fi
         env:
