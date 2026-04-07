@@ -1,0 +1,34 @@
+reviews:
+  profile: followup
+  poem: false
+  path_instructions:
+    - path: "**/*.{ts,tsx,js,jsx}"
+      instructions: |
+        - If a file diff only consists of spacing, indentation, or formatting changes
+          without any logical code changes, request the author to revert those changes.
+        - Point out that formatting should strictly follow the project's Prettier/ESLint configuration.
+    - path: "**/*.tsx"
+      instructions: |
+        - Ensure all React components use functional components with hooks.
+        - Catch any missing `useMemo` or `useCallback` dependencies.
+        - Reject any direct DOM manipulations outside of refs or useEffect.
+    - path: "**/*.ts"
+      instructions: |
+        - Flag any `any` types. Force strict TypeScript typing.
+
+tools:
+  phpstan:
+    enabled: false
+  rubocop:
+    enabled: false
+  swiftlint:
+    enabled: false
+
+finishing_touches:
+  simplify:
+    enabled: true
+
+pre_merge_checks:
+  title:
+    mode: error
+    requirements: 'Must follow semantic commit structure (e.g., feat:, fix:, docs:, chore:)'
