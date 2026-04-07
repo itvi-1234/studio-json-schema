@@ -1,5 +1,5 @@
 reviews:
-  profile: followup
+  profile: assertive
   poem: false
   path_instructions:
     - path: "**/*.{ts,tsx,js,jsx}"
@@ -15,15 +15,6 @@ reviews:
     - path: "**/*.ts"
       instructions: |
         - Flag any `any` types. Force strict TypeScript typing.
-
-tools:
-  phpstan:
-    enabled: false
-  rubocop:
-    enabled: false
-  swiftlint:
-    enabled: false
-
 finishing_touches:
   simplify:
     enabled: true
@@ -32,3 +23,12 @@ pre_merge_checks:
   title:
     mode: error
     requirements: 'Must follow semantic commit structure (e.g., feat:, fix:, docs:, chore:)'
+    
+tools:
+  phpstan:
+    enabled: false
+  rubocop:
+    enabled: false
+  swiftlint:
+    enabled: false
+
