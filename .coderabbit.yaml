@@ -1,5 +1,5 @@
 reviews:
-  profile: assertive
+  profile: chill
   poem: false
   path_instructions:
     - path: "**/*.{ts,tsx,js,jsx}"
@@ -23,7 +23,7 @@ pre_merge_checks:
   title:
     mode: error
     requirements: 'Must follow semantic commit structure (e.g., feat:, fix:, docs:, chore:)'
-    
+
 tools:
   phpstan:
     enabled: false
