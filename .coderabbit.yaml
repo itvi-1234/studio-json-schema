@@ -10,25 +10,25 @@ reviews:
     - path: "**/*.ts"
       instructions: |
         - Flag any `any` types. Force strict TypeScript typing.
-finishing_touches:
-  simplify:
-    enabled: true
-  unit_tests:
-    enabled: false
-code_generation:
-  unit_tests:
-    enabled: false
+  finishing_touches:
+    simplify:
+      enabled: true
+    unit_tests:
+      enabled: false
+  code_generation:
+    unit_tests:
+      enabled: false
 
-pre_merge_checks:
-  title:
-    mode: warning
-    requirements: 'Must follow semantic commit structure (e.g., feat:, fix:, docs:, chore:)'
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: 'Must follow semantic commit structure (e.g., feat:, fix:, docs:, chore:)'
 
-tools:
-  phpstan:
-    enabled: false
-  rubocop:
-    enabled: false
-  swiftlint:
-    enabled: false
+  tools:
+    phpstan:
+      enabled: false
+    rubocop:
+      enabled: false
+    swiftlint:
+      enabled: false
 
