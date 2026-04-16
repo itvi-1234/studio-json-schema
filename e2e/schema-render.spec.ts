@@ -270,3 +270,164 @@ test.describe("Default Schema on First Load", () => {
     await expect(controls).toBeVisible();
   });
 });
+
+test.describe("Panel Resize", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await waitForGraph(page);
+  });
+
+  test("resize handle is present between editor and graph panels", async ({ page }) => {
+    const handle = page.locator("[role='separator']").first();
+    await expect(handle).toBeVisible();
+  });
+
+  test("dragging resize handle changes graph panel width", async ({ page }) => {
+    const graphPanel = page.locator(".react-flow");
+    const handle = page.locator("[role='separator']").first();
+
+    const initialBox = await graphPanel.boundingBox();
+    const handleBox = await handle.boundingBox();
+    if (!handleBox || !initialBox) throw new Error("Bounding boxes not found");
+
+    const startX = handleBox.x + handleBox.width / 2;
+    const startY = handleBox.y + handleBox.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 150, startY, { steps: 15 });
+    await page.mouse.up();
+    await page.waitForTimeout(300);
+
+    const newBox = await graphPanel.boundingBox();
+    expect(newBox!.width).toBeLessThan(initialBox!.width);
+  });
+});
+
+test.describe("Graph Layout After Editor Hide", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await waitForGraph(page);
+  });
+
+  test("graph nodes remain visible after editor panel is hidden", async ({ page }) => {
+    const hideBtn = page.locator("button[aria-label='Hide Editor']");
+    await hideBtn.click();
+    await page.waitForTimeout(400);
+
+    const nodes = page.locator(".react-flow__node");
+    await expect(nodes.first()).toBeVisible({ timeout: 10_000 });
+  });
+
+  test("graph panel expands to take more width after editor is hidden", async ({ page }) => {
+    const graphPanel = page.locator(".react-flow");
+    const initialBox = await graphPanel.boundingBox();
+
+    const hideBtn = page.locator("button[aria-label='Hide Editor']");
+    await hideBtn.click();
+    await page.waitForTimeout(400);
+
+    const newBox = await graphPanel.boundingBox();
+    expect(newBox!.width).toBeGreaterThan(initialBox!.width);
+  });
+
+  test("validation status bar disappears when editor is hidden", async ({ page }) => {
+    await expect(page.locator(".text-green-400")).toBeVisible({ timeout: 10_000 });
+
+    const hideBtn = page.locator("button[aria-label='Hide Editor']");
+    await hideBtn.click();
+    await page.waitForTimeout(400);
+
+    await expect(page.locator(".text-green-400")).not.toBeVisible({ timeout: 5_000 });
+  });
+});
+
+test.describe("React Flow Zoom Controls", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await waitForGraph(page);
+  });
+
+  test("all zoom controls are visible", async ({ page }) => {
+    await expect(page.locator(".react-flow__controls-zoomin")).toBeVisible();
+    await expect(page.locator(".react-flow__controls-zoomout")).toBeVisible();
+    await expect(page.locator(".react-flow__controls-fitview")).toBeVisible();
+    await expect(page.locator(".react-flow__controls-interactive")).toBeVisible();
+  });
+
+  test("zoom in button increases viewport scale", async ({ page }) => {
+    const getScale = async () => {
+      const transform = await page
+        .locator(".react-flow__viewport")
+        .evaluate((el) => (el as HTMLElement).style.transform);
+      const match = transform.match(/scale\(([^)]+)\)/);
+      return match ? parseFloat(match[1]) : 1;
+    };
+
+    const initialScale = await getScale();
+    await page.locator(".react-flow__controls-zoomin").click();
+    await page.waitForTimeout(400);
+    const newScale = await getScale();
+
+    expect(newScale).toBeGreaterThan(initialScale);
+  });
+
+  test("zoom out button decreases viewport scale", async ({ page }) => {
+    const getScale = async () => {
+      const transform = await page
+        .locator(".react-flow__viewport")
+        .evaluate((el) => (el as HTMLElement).style.transform);
+      const match = transform.match(/scale\(([^)]+)\)/);
+      return match ? parseFloat(match[1]) : 1;
+    };
+
+    await page.locator(".react-flow__controls-zoomin").click();
+    await page.waitForTimeout(400);
+    const zoomedInScale = await getScale();
+
+    await page.locator(".react-flow__controls-zoomout").click();
+    await page.waitForTimeout(400);
+    const zoomedOutScale = await getScale();
+
+    expect(zoomedOutScale).toBeLessThan(zoomedInScale);
+  });
+
+  test("fit view button keeps graph nodes visible", async ({ page }) => {
+    await page.locator(".react-flow__controls-zoomin").click();
+    await page.locator(".react-flow__controls-zoomin").click();
+    await page.waitForTimeout(300);
+
+    await page.locator(".react-flow__controls-fitview").click();
+    await page.waitForTimeout(500);
+
+    const nodes = page.locator(".react-flow__node");
+    await expect(nodes.first()).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+test.describe("Fullscreen Mode", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await waitForGraph(page);
+  });
+
+  test("fullscreen toggle button is present with correct title", async ({ page }) => {
+    const fsBtn = page.locator("button[title='Enter Fullscreen']");
+    await expect(fsBtn).toBeVisible();
+  });
+
+  test("React Flow controls remain visible in fullscreen mode", async ({ page }) => {
+    await page.locator("button[title='Enter Fullscreen']").click();
+    await page.waitForTimeout(500);
+
+    await expect(page.locator(".react-flow__controls")).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("graph nodes remain visible in fullscreen mode", async ({ page }) => {
+    await page.locator("button[title='Enter Fullscreen']").click();
+    await page.waitForTimeout(500);
+
+    const nodes = page.locator(".react-flow__node");
+    await expect(nodes.first()).toBeVisible({ timeout: 10_000 });
+  });
+});
