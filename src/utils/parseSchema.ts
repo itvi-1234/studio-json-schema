@@ -8,7 +8,7 @@ type HighlightedNodeRange = {
     end: number;
 };
 
-type JSONSchema = Json & {
+export type JSONSchema = Json & {
     $schema: string;
     $id: string
 }

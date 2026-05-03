@@ -26,9 +26,9 @@ import EditorToggleButton from "./EditorToggleButton";
 import {
   parseSchema,
   getHighlightedNodeRangeFromPath,
+  type JSONSchema,
 } from "../utils/parseSchema";
 import YAML from "js-yaml";
-import type { JSONSchema } from "@apidevtools/json-schema-ref-parser";
 
 type ValidationStatus = {
   status: "success" | "warning" | "error";
