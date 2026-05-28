@@ -43,7 +43,6 @@ type CreateBrowser = (
 const DEFAULT_SCHEMA_ID = "https://studio.ioflux.org/schema";
 const DEFAULT_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema";
 const SESSION_SCHEMA_KEY = "ioflux.schema.editor.content";
-const SESSION_FORMAT_KEY = "ioflux.schema.editor.format";
 const DEFAULT_EDITOR_PANEL_WIDTH = 25; // in percentage
 
 const JSON_SCHEMA_DIALECTS = [
@@ -76,19 +75,6 @@ const getValidationUI = (theme: "light" | "dark") => ({
   },
 });
 
-const saveFormat = (key: string, format: SchemaFormat) => {
-  sessionStorage.setItem(key, format);
-};
-
-const loadSchemaJSON = (key: string): any => {
-  const raw = sessionStorage.getItem(key);
-  if (!raw) return defaultSchema;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return defaultSchema;
-  }
-};
 
 const saveSchemaJSON = (key: string, schema: JSONSchema) => {
   sessionStorage.setItem(key, JSON.stringify(schema, null, 2));
@@ -254,17 +240,6 @@ const MonacoEditor = () => {
     }
   }, [selectedNode?.id, schemaFormat, schemaText]);
 
-  useEffect(() => {
-    saveFormat(SESSION_FORMAT_KEY, schemaFormat);
-
-    const schemaJSON = loadSchemaJSON(SESSION_SCHEMA_KEY);
-
-    setSchemaText(
-      schemaFormat === "yaml"
-        ? YAML.dump(schemaJSON)
-        : JSON.stringify(schemaJSON, null, 2)
-    );
-  }, [schemaFormat]);
 
   useEffect(() => {
     if (!schemaText.trim()) return;
