@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
-import { BsUpload } from "react-icons/bs";
+import { BsUpload, BsDownload } from "react-icons/bs";
 import { Tooltip } from "react-tooltip";
 import { SESSION_SCHEMA_KEY } from "../constants";
 
@@ -92,6 +92,7 @@ const MonacoEditor = () => {
     selectedNode,
     schemaText,
     setSchemaText,
+    triggerExportGraph,
   } = useContext(AppContext);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -369,7 +370,7 @@ const MonacoEditor = () => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-        <div className="flex items-center gap-2 px-2 py-1 bg-[var(--validation-bg-color)]">
+      <div className="flex items-center gap-2 px-2 py-1 bg-[var(--validation-bg-color)]">
           <input
             type="file"
             id="schema-file-input"
@@ -405,6 +406,15 @@ const MonacoEditor = () => {
               <option value="json">JSON</option>
               <option value="yaml">YAML</option>
             </select>
+            <button
+              onClick={triggerExportGraph}
+              className="flex items-center gap-1.5 bg-[var(--bg-color)] border border-[var(--popup-border-color)] text-[var(--text-color)] text-sm px-2 py-0.5 rounded-sm hover:opacity-75 transition-opacity cursor-pointer"
+              aria-label="Export graph as image"
+              title="Export graph as image"
+            >
+              <BsDownload size={12} />
+              <span>Export</span>
+            </button>
           </div>
         </div>
       <div className="flex-1 min-h-0">
