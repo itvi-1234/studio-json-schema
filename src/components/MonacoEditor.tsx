@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
 
-import { parseTree, findNodeAtLocation } from "jsonc-parser";
 import {
   Panel,
   PanelGroup,
@@ -20,13 +19,16 @@ import {
 import Editor, { type OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import defaultSchema from "../data/defaultJSONSchema.json";
-import { AppContext } from "../contexts/AppContext";
+import { AppContext, type SchemaFormat } from "../contexts/AppContext";
 import SchemaVisualization from "./SchemaVisualization";
 import NavigationBar from "./NavigationBar";
 import EditorToggleButton from "./EditorToggleButton";
-import { parseSchema } from "../utils/parseSchema";
+import {
+  parseSchema,
+  getHighlightedNodeRangeFromPath,
+  type JSONSchema,
+} from "../utils/parseSchema";
 import YAML from "js-yaml";
-import type { JSONSchema } from "@apidevtools/json-schema-ref-parser";
 
 type ValidationStatus = {
   status: "success" | "warning" | "error";
@@ -62,15 +64,19 @@ const getValidationUI = (theme: "light" | "dark") => ({
   },
   warning: {
     message: `⚠ Schema dialect not provided. Using default dialect: ${DEFAULT_SCHEMA_DIALECT}`,
-    className: theme === "dark" ? "text-yellow-400" : "text-amber-800",
+    className:
+      theme === "dark"
+        ? "text-yellow-400 break-words"
+        : "text-amber-800 break-words",
   },
   error: {
     message: "✗ ",
-    className: "text-red-400",
+    className:
+      theme === "dark"
+        ? "text-red-400 break-words"
+        : "text-red-700 break-words",
   },
 });
-
-type SchemaFormat = "json" | "yaml";
 
 const saveFormat = (key: string, format: SchemaFormat) => {
   sessionStorage.setItem(key, format);
@@ -91,8 +97,14 @@ const saveSchemaJSON = (key: string, schema: JSONSchema) => {
 };
 
 const MonacoEditor = () => {
-  const { theme, isFullScreen, containerRef, schemaFormat, selectedNode } =
-    useContext(AppContext);
+  const {
+    theme,
+    isFullScreen,
+    containerRef,
+    schemaFormat,
+    changeSchemaFormat,
+    selectedNode,
+  } = useContext(AppContext);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const editorPanelRef = useRef<ImperativePanelHandle>(null);
@@ -123,6 +135,53 @@ const MonacoEditor = () => {
   const [editorVisible, setEditorVisible] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const MOBILE_BREAKPOINT = 768;
+  const [isMobile, setIsMobile] = useState(
+    () => window.innerWidth < MOBILE_BREAKPOINT
+  );
+
+  useEffect(() => {
+    const handleResize = () =>
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    editorPanelRef.current?.resize(isMobile ? 40 : DEFAULT_EDITOR_PANEL_WIDTH);
+    setEditorVisible(true);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const handleViewportResize = () => {
+      const keyboardHeight = window.innerHeight - viewport.height;
+      const isKeyboardOpen = keyboardHeight > 100;
+      if (isKeyboardOpen) {
+        const totalHeight = window.innerHeight;
+        const visiblePercent = Math.round(
+          (viewport.height / totalHeight) * 100
+        );
+        const editorPercent = Math.max(
+          40,
+          Math.min(Math.round(visiblePercent * 0.55), 70)
+        );
+        editorPanelRef.current?.resize(editorPercent);
+        if (!editorVisible) {
+          setEditorVisible(true);
+        }
+      } else {
+        editorPanelRef.current?.resize(40);
+      }
+    };
+
+    viewport.addEventListener("resize", handleViewportResize);
+    return () => viewport.removeEventListener("resize", handleViewportResize);
+  }, [isMobile, editorVisible]);
+
   const toggleEditorVisibility = () => {
     if (!editorPanelRef.current) return;
 
@@ -131,7 +190,7 @@ const MonacoEditor = () => {
     if (editorVisible) {
       editorPanelRef.current.collapse();
     } else {
-      editorPanelRef.current.resize(DEFAULT_EDITOR_PANEL_WIDTH);
+      editorPanelRef.current.resize(isMobile ? 40 : DEFAULT_EDITOR_PANEL_WIDTH);
     }
 
     setEditorVisible((prev) => !prev);
@@ -168,18 +227,18 @@ const MonacoEditor = () => {
         return /^\d+$/.test(decoded) ? parseInt(decoded, 10) : decoded;
       });
 
-    const tree = parseTree(text);
-    if (!tree) return;
+    const highlightedNodeRange = getHighlightedNodeRangeFromPath(
+      text,
+      path,
+      schemaFormat
+    );
 
-    const node = findNodeAtLocation(tree, path);
-
-    if (node) {
-      const startPos = model.getPositionAt(node.offset);
-      const endPos = model.getPositionAt(node.offset + node.length);
+    if (highlightedNodeRange) {
+      const startPos = model.getPositionAt(highlightedNodeRange.start);
+      const endPos = model.getPositionAt(highlightedNodeRange.end);
 
       editorRef.current.revealPositionInCenter(startPos);
       editorRef.current.setPosition(startPos);
-      editorRef.current.focus();
 
       const decoration = {
         range: new (window as any).monaco.Range(
@@ -201,7 +260,7 @@ const MonacoEditor = () => {
 
       model.deltaDecorations(oldDecorations, [decoration]);
     }
-  }, [selectedNode?.id]);
+  }, [selectedNode?.id, schemaFormat, schemaText]);
 
   useEffect(() => {
     saveFormat(SESSION_FORMAT_KEY, schemaFormat);
@@ -250,6 +309,8 @@ const MonacoEditor = () => {
         };
 
         const browser = createBrowser(schemaId, schemaDocument);
+        // The Hyperjump `getSchema` expects a full browser instance, but we only need the _cache
+        // property for local-only resolution. This cast is safe because our usage only triggers cache lookup.
         // @ts-expect-error
         const schema = await getSchema(schemaDocument.baseUri, browser);
 
@@ -280,59 +341,126 @@ const MonacoEditor = () => {
     return () => clearTimeout(timeout);
   }, [schemaText, schemaFormat]);
 
+  const editorPanel = (
+    <Panel
+      className="flex flex-col"
+      defaultSize={isMobile ? 40 : DEFAULT_EDITOR_PANEL_WIDTH}
+      ref={editorPanelRef}
+      collapsible
+    >
+      <div className="flex items-center gap-2 px-2 py-1 bg-[var(--validation-bg-color)]">
+        <label htmlFor="schema-format-select" className="sr-only">
+          Schema format
+        </label>
+        <select
+          id="schema-format-select"
+          value={schemaFormat}
+          onChange={(e) => changeSchemaFormat(e.target.value as SchemaFormat)}
+          className="ml-auto flex-shrink-0 bg-[var(--bg-color)] text-[var(--text-color)] text-sm outline-none cursor-pointer border border-[var(--popup-border-color)] rounded-sm"
+        >
+          <option value="json">JSON</option>
+          <option value="yaml">YAML</option>
+        </select>
+      </div>
+      <div className="flex-1 min-h-0">
+        <Editor
+          height="100%"
+          width="100%"
+          language={schemaFormat}
+          value={schemaText}
+          theme={theme === "light" ? "vs-light" : "vs-dark"}
+          options={{
+            minimap: { enabled: false },
+            occurrencesHighlight: "off",
+          }}
+          onChange={(value) => setSchemaText(value ?? "")}
+          onMount={handleEditorDidMount}
+        />
+      </div>
+      <div
+        role="status"
+        aria-live="polite"
+        aria-label={`Schema validation: ${schemaValidation.message}`}
+        className="shrink-0 px-2 py-1.5 bg-[var(--validation-bg-color)] text-sm"
+      >
+        <span className={VALIDATION_UI[schemaValidation.status].className}>
+          {schemaValidation.message}
+        </span>
+      </div>
+    </Panel>
+  );
+
+  const visualizationPanel = (
+    <Panel
+      minSize={isMobile ? undefined : 60}
+      className="flex flex-col relative bg-[var(--visualize-bg-color)]"
+    >
+      <SchemaVisualization compiledSchema={compiledSchema} />
+    </Panel>
+  );
+
+  const resizeHandle = (
+    <PanelResizeHandle
+      className={`${isMobile ? "h-[1px]" : "w-[1px]"} ${
+        isMobile && !editorVisible ? "bg-transparent" : "bg-gray-400"
+      } relative`}
+    >
+      {(!isMobile || editorVisible) && (
+        <div>
+          <EditorToggleButton
+            className={
+              isMobile
+                ? "absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+                : "absolute top-2 left-2 z-10"
+            }
+            editorVisible={editorVisible}
+            toggleEditorVisibility={toggleEditorVisibility}
+            isMobile={isMobile}
+          />
+        </div>
+      )}
+    </PanelResizeHandle>
+  );
+
   return (
     <div
       ref={containerRef}
-      className={`h-[92vh] flex flex-col ${
+      className={`flex-1 min-h-0 flex flex-col relative ${
         isAnimating ? "panel-animating" : ""
       }`}
     >
-      {isFullScreen && (
-        <NavigationBar />
-      )}
-      <PanelGroup direction="horizontal">
-        <Panel
-          className="flex flex-col"
-          defaultSize={DEFAULT_EDITOR_PANEL_WIDTH}
-          ref={editorPanelRef}
-          collapsible
-        >
-          <Editor
-            height="90%"
-            width="100%"
-            language={schemaFormat}
-            value={schemaText}
-            theme={theme === "light" ? "vs-light" : "vs-dark"}
-            options={{
-              minimap: { enabled: false },
-              occurrencesHighlight: "off",
-            }}
-            onChange={(value) => setSchemaText(value ?? "")}
-            onMount={handleEditorDidMount}
-          />
-          <div className="flex-1 p-2 bg-[var(--validation-bg-color)] text-sm overflow-y-auto">
-            <div className={VALIDATION_UI[schemaValidation.status].className}>
-              {schemaValidation.message}
-            </div>
-          </div>
-        </Panel>
-        <PanelResizeHandle className="w-[1px] bg-gray-400 relative">
-          <div>
-            <EditorToggleButton
-              className={"absolute top-2 left-2 z-10"}
-              editorVisible={editorVisible}
-              toggleEditorVisibility={toggleEditorVisibility}
-            />
-          </div>
-        </PanelResizeHandle>
-
-        <Panel
-          minSize={60}
-          className="flex flex-col relative bg-[var(--visualize-bg-color)]"
-        >
-          <SchemaVisualization compiledSchema={compiledSchema} />
-        </Panel>
+      {isFullScreen && <NavigationBar />}
+      <PanelGroup
+        className="flex-1"
+        direction={isMobile ? "vertical" : "horizontal"}
+      >
+        {isMobile ? (
+          <>
+            {visualizationPanel}
+            {resizeHandle}
+            {editorPanel}
+          </>
+        ) : (
+          <>
+            {editorPanel}
+            {resizeHandle}
+            {visualizationPanel}
+          </>
+        )}
       </PanelGroup>
+      {isMobile && !editorVisible && (
+        <div
+          className="absolute bottom-0 inset-x-0 flex justify-center pointer-events-none"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          <EditorToggleButton
+            className="pointer-events-auto"
+            editorVisible={editorVisible}
+            toggleEditorVisibility={toggleEditorVisibility}
+            isMobile={true}
+          />
+        </div>
+      )}
     </div>
   );
 };
