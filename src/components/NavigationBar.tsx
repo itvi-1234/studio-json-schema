@@ -22,7 +22,6 @@ const NavigationBar = () => {
     setSelectedNode,
     triggerNavigateMatch,
   } = useContext(AppContext);
-
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -36,6 +35,7 @@ const NavigationBar = () => {
         if (mobileSearchOpen) setMobileSearchOpen(false);
         return;
       }
+
       if (event.key === "Enter") {
         event.preventDefault();
         triggerNavigateMatch(event.shiftKey ? "prev" : "next");
@@ -70,6 +70,7 @@ const NavigationBar = () => {
             className="w-15 h-15 md:w-15 md:h-15"
             draggable="false"
           />
+
           <div className="flex font-mono flex-col">
             <span className="text-2xl font-bold text-[var(--tool-name-color)]">
               Studio
@@ -201,6 +202,7 @@ const NavigationBar = () => {
           }`}
         >
           <RiSearchLine className="text-[var(--navigation-text-color)] opacity-70" />
+          
           <input
             ref={mobileSearchInputRef}
             type="text"
