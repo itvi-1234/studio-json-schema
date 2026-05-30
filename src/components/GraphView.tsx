@@ -264,7 +264,7 @@ const GraphView = ({
 
     setTimeout(() => {
       fitView({ duration: 800, padding: 0.05 });
-    }, 50);
+    }, 300);
   }, [nodes, collisionResolved, allNodesMeasured, setNodes, fitView]);
 
   useEffect(() => {
