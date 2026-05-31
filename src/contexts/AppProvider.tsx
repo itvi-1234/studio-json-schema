@@ -53,14 +53,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       : JSON.stringify(initialSchemaJSON, null, 2)
   );
 
-  useEffect(() => {
-    const schemaJSON = loadSchemaJSON(SESSION_SCHEMA_KEY);
-    setSchemaText(
-      schemaFormat === "yaml"
-        ? YAML.dump(schemaJSON)
-        : JSON.stringify(schemaJSON, null, 2)
-    );
-  }, [schemaFormat]);
+
 
   const toggleTheme = () => {
     setTheme((prev) => {
@@ -70,9 +63,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const changeSchemaFormat = (format: SchemaFormat) => {
-    setSchemaFormat(format);
-  };
+  const changeSchemaFormat = useCallback(
+    (format: SchemaFormat) => {
+      sessionStorage.setItem("ioflux.schema.editor.format", format);
+      setSchemaFormat(format);
+      if (format === schemaFormat) return;
+      try {
+        if (format === "yaml") {
+          const parsed = JSON.parse(schemaText);
+          setSchemaText(YAML.dump(parsed));
+        } else {
+          const parsed = YAML.load(schemaText) as object;
+          setSchemaText(JSON.stringify(parsed, null, 2));
+        }
+      } catch {
+        // If conversion fails, keep existing text as-is
+      }
+    },
+    [schemaFormat, schemaText]
+  );
 
   const [selectedNode, setSelectedNode] = useState<SelectedNode | null>(null);
   const [searchString, setSearchString] = useState("");
