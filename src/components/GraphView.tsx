@@ -261,12 +261,15 @@ const GraphView = ({
     });
     setNodes(resolved);
     setCollisionResolved(true);
-    
+  }, [nodes, collisionResolved, allNodesMeasured, setNodes]);
+
+  useEffect(() => {
+    if (!collisionResolved) return;
     const rafId = requestAnimationFrame(() => {
-      fitView({ padding: 0.05 });
+      fitView({ padding: 0.05, duration: 300 });
     });
     return () => cancelAnimationFrame(rafId);
-  }, [nodes, collisionResolved, allNodesMeasured, setNodes, fitView]);
+  }, [collisionResolved, fitView]);
 
   useEffect(() => {
     if (errorMessage) {
